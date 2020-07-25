@@ -61,16 +61,17 @@ static NSRect mainRect;
  //       NSString* desc = @"The multi-mirror, 17 meter-diameter MAGIC telescopes";
     
 //    NSRect textRect = CGRectMake(s.width, rect.size.height, rect.size.width-s.width, rect.size.height);
-    NSSize textSize = NSMakeSize(500, 500);
+    NSSize textSize = NSMakeSize(rect.size.width/3, rect.size.height/4);
         NSRect textRect = CGRectMake(rect.size.width-textSize.width,
                                      rect.size.height-textSize.height,
                                      textSize.width, textSize.height);
     [super drawRect:textRect];
+    [[NSColor darkGrayColor] setFill];
+    NSRectFill(textRect);
     
-    NSFont* font = [NSFont fontWithName:@"Helvetica" size:14.0];
+    NSFont* font = [NSFont fontWithName:@"Helvetica" size:0.02*rect.size.height];
     NSDictionary* attributes = @{ NSFontAttributeName: font,
-                                  NSForegroundColorAttributeName: [NSColor lightGrayColor],
-                                  NSBackgroundColorAttributeName: [NSColor darkGrayColor]
+                                  NSForegroundColorAttributeName: [NSColor lightGrayColor]
     };
     [desc drawInRect:textRect withAttributes:attributes];
     
