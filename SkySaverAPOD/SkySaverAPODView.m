@@ -15,6 +15,10 @@
     self = [super initWithFrame:frame isPreview:isPreview];
     if (self) {
         [self setAnimationTimeInterval:1/30.0];
+        
+        NSRect mainRect = CGRectMake(0, 0, frame.size.width, frame.size.height);
+        [self drawRect:mainRect];
+        
     }
     return self;
 }
@@ -32,6 +36,8 @@
 - (void)drawRect:(NSRect)rect
 {
     [super drawRect:rect];
+    [[NSColor greenColor] setFill];
+    NSRectFill(rect);
 }
 
 - (void)animateOneFrame
