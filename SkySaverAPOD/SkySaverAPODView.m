@@ -45,7 +45,8 @@ static NSRect mainRect;
     // picture
     NSImage* pic = [[NSImage alloc] initByReferencingURL:[NSURL URLWithString:@"https://apod.nasa.gov/apod/image/2007/DSC7590-Leutenegger1200c.jpg"]];
 
-    NSRect picRect = CGRectMake(0, 0, rect.size.width, rect.size.height);
+    NSSize s = [pic size];
+    NSRect picRect = CGRectMake(0, 0, s.width, s.height);
     [super drawRect:picRect];
 
     
