@@ -10,7 +10,7 @@
 
 @implementation SkySaverAPODView
 
-static NSRect picRect;
+
 static NSRect mainRect;
 
 - (instancetype)initWithFrame:(NSRect)frame isPreview:(BOOL)isPreview
@@ -20,11 +20,6 @@ static NSRect mainRect;
         [self setAnimationTimeInterval:1/30.0];
         
         mainRect = CGRectMake(0, 0, frame.size.width, frame.size.height);
-        
-        
-        picRect = CGRectMake(0, 0, 500, 500);
-
-        
         
     }
     return self;
@@ -42,13 +37,17 @@ static NSRect mainRect;
 
 - (void)drawRect:(NSRect)rect
 {
+    // background
     [super drawRect:rect];
     [[NSColor greenColor] setFill];
     NSRectFill(rect);
     
-
-    [super drawRect:picRect];
+    // picture
     NSImage* pic = [[NSImage alloc] initByReferencingURL:[NSURL URLWithString:@"https://apod.nasa.gov/apod/image/2007/DSC7590-Leutenegger1200c.jpg"]];
+
+    NSRect picRect = CGRectMake(0, 0, rect.size.width, rect.size.height);
+    [super drawRect:picRect];
+
     
     
     if (!pic.isValid){
