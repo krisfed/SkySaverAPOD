@@ -51,10 +51,14 @@ static NSRect mainRect;
     [super drawRect:picRect];
     
 //    NSURL* picURL = [NSURL fileURLWithPath:@"https://apod.nasa.gov/apod/image/2007/DSC7590-Leutenegger1200c.jpg"];
-//    NSImage* pic = [[NSImage alloc] initByReferencingURL:picURL];
-    
+//    NSString* picString = [[NSString alloc] initWithUTF8String:<#(nonnull const char *)#>;
 
-    NSImage* pic = [[NSImage alloc] initByReferencingFile:@"/Users/Christik/Pictures/DSC7590-Leutenegger.jpg"];
+//    NSImage* pic = [[NSImage alloc]  initWithContentsOfFile:@"https://i.pinimg.com/originals/ae/c4/53/aec453161b2f33ffc6219d8a758307a9.jpg"];
+//
+
+    NSImage* pic = [[NSImage alloc] initByReferencingURL:[NSURL URLWithString:@"https://apod.nasa.gov/apod/image/2007/DSC7590-Leutenegger1200c.jpg"]];
+    
+    // "/Users/Christik/Pictures/DSC7590-Leutenegger.jpg"]
     
     if (!pic.isValid){
         NSLog(@"image not created\n");
