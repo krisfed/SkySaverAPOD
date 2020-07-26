@@ -20,9 +20,12 @@ static NSString* desc;
 static NSFont* font;
 static NSDictionary* attributes;
 //static NSSize textSize;
+static NSRect picRect;
+static NSUInteger desc_length;
 
 
 int zoom_fraq;
+int string_start;
 
 - (instancetype)initWithFrame:(NSRect)frame isPreview:(BOOL)isPreview
 {
@@ -31,6 +34,7 @@ int zoom_fraq;
         [self setAnimationTimeInterval:1/60.0];
         
         zoom_fraq = 0;
+        string_start = 0;
         mainRect = CGRectMake(0, 0, frame.size.width, frame.size.height);
         
         // request HTTP info
@@ -62,12 +66,7 @@ int zoom_fraq;
             NSLog(@"image not created\n");
         }
         desc = [NSString stringWithFormat:@"%@", APODdata[@"explanation"]];
-//        font = [NSFont fontWithName:@"Helvetica" size:0.03*frame.size.height];
-//        attributes = @{ NSFontAttributeName: font,
-//                                      NSForegroundColorAttributeName: [NSColor lightGrayColor]};
-        //textSize = NSMakeSize(frame.size.width/3, frame.size.height/4);
-
-
+        desc_length = [desc length];
         
     }
     return self;
@@ -94,29 +93,31 @@ int zoom_fraq;
 
 
     // ----------- picture -----------
-    double zoom_level = 1 + (zoom_fraq/1000.0);
-    double remaining_portion = 1 - (zoom_fraq/1000.0);
-    NSLog(@"ZOOM LEVEL: %f ", zoom_level);
-
+    picRect = CGRectMake(0, 0, rect.size.width, rect.size.height);
+    double portion_to_display = 1 - (zoom_fraq/1000.0);
     NSSize s = [pic size];
-//    NSRect picRect = CGRectMake(0, 0, zoom_level*rect.size.width, zoom_level*rect.size.height);
-    NSRect picRect = CGRectMake(0, 0, rect.size.width, rect.size.height);
     NSRect picPortionRect = { {0,0},
-        {s.width*remaining_portion, s.height*remaining_portion}
+        {s.width*portion_to_display, s.height*portion_to_display}
     };
 
     // ----------- text -----------
 
-    NSSize textSize = NSMakeSize(rect.size.width/3, rect.size.height/4);
+    NSSize textSize = NSMakeSize(rect.size.width, 0.03*rect.size.height + 5);
     NSRect textRect = {
         {rect.size.width-textSize.width, rect.size.height-textSize.height},
         {textSize.width, textSize.height}
     };
 
+    NSString* string_to_display = [desc substringFromIndex:string_start];
 
     font = [NSFont fontWithName:@"Helvetica" size:0.03*rect.size.height];
+    NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+    //paragraphStyle.alignment = NSTextAlignmentCenter;
+    paragraphStyle.headIndent = 10;
     attributes = @{ NSFontAttributeName: font,
-                                  NSForegroundColorAttributeName: [NSColor lightGrayColor]};
+                    NSForegroundColorAttributeName: [NSColor lightGrayColor],
+                    NSParagraphStyleAttributeName: paragraphStyle
+    };
 
 
     // ----------- drawing -----------
@@ -125,17 +126,20 @@ int zoom_fraq;
     [pic drawInRect:picRect fromRect:picPortionRect operation:NSCompositingOperationCopy fraction:1];
     [[NSColor colorWithSRGBRed:0 green:0 blue:0 alpha:0.6] setFill];
     NSRectFillUsingOperation(textRect, NSCompositingOperationSourceOver );
-    [desc drawInRect:textRect withAttributes:attributes];
+    [string_to_display drawInRect:textRect withAttributes:attributes];
 
     
 }
 
 - (void)animateOneFrame
 {
-    //NSLog(@"Kris log-----");
+    // update values for animation:
     zoom_fraq = (zoom_fraq + 1)%500;
-    [self setNeedsDisplayInRect:mainRect];
+    string_start += 10;
+    string_start = (string_start+5)%desc_length;
     
+    
+    [self setNeedsDisplayInRect:mainRect];
     return;
 }
 
