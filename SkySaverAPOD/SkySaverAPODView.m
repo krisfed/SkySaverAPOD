@@ -95,10 +95,15 @@ int zoom_fraq;
 
     // ----------- picture -----------
     double zoom_level = 1 + (zoom_fraq/1000.0);
+    double remaining_portion = 1 - (zoom_fraq/1000.0);
     NSLog(@"ZOOM LEVEL: %f ", zoom_level);
 
     NSSize s = [pic size];
-    NSRect picRect = CGRectMake(0, 0, zoom_level*rect.size.width, zoom_level*rect.size.height);
+//    NSRect picRect = CGRectMake(0, 0, zoom_level*rect.size.width, zoom_level*rect.size.height);
+    NSRect picRect = CGRectMake(0, 0, rect.size.width, rect.size.height);
+    NSRect picPortionRect = { {0,0},
+        {s.width*remaining_portion, s.height*remaining_portion}
+    };
 
     // ----------- text -----------
 
@@ -117,7 +122,7 @@ int zoom_fraq;
     // ----------- drawing -----------
     [super drawRect:picRect];
     [super drawRect:textRect];
-    [pic drawInRect:picRect];
+    [pic drawInRect:picRect fromRect:picPortionRect operation:NSCompositingOperationCopy fraction:1];
     [[NSColor colorWithSRGBRed:0 green:0 blue:0 alpha:0.6] setFill];
     NSRectFillUsingOperation(textRect, NSCompositingOperationSourceOver );
     [desc drawInRect:textRect withAttributes:attributes];
