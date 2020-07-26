@@ -14,12 +14,15 @@
 static NSRect mainRect;
 static NSDictionary* APODdata;
 
+int zoom_fraq;
+
 - (instancetype)initWithFrame:(NSRect)frame isPreview:(BOOL)isPreview
 {
     self = [super initWithFrame:frame isPreview:isPreview];
     if (self) {
         [self setAnimationTimeInterval:1/30.0];
         
+        zoom_fraq = 0;
         mainRect = CGRectMake(0, 0, frame.size.width, frame.size.height);
         
         // request HTTP info
@@ -74,13 +77,14 @@ static NSDictionary* APODdata;
     
     
     // ----------- picture -----------
-    
+    double zoom_level = 1 + (((double)zoom_fraq)/100);
+    NSLog(@"ZOOM LEVEL: %f ", zoom_level);
     NSString* hdurl = [NSString stringWithFormat:@"%@", APODdata[@"hdurl"]];
     NSLog(hdurl);
     NSImage* pic = [[NSImage alloc] initByReferencingURL:[NSURL URLWithString:hdurl]];
     
     NSSize s = [pic size];
-    NSRect picRect = CGRectMake(0, 0, rect.size.width, rect.size.height);
+    NSRect picRect = CGRectMake(0, 0, zoom_level*rect.size.width, zoom_level*rect.size.height);
     
     if (!pic.isValid){
         NSLog(@"image not created\n");
@@ -120,6 +124,8 @@ static NSDictionary* APODdata;
 - (void)animateOneFrame
 {
     //NSLog(@"Kris log-----");
+    zoom_fraq = (zoom_fraq + 1)%50;
+    [self setNeedsDisplay:YES];
     return;
 }
 
