@@ -26,6 +26,7 @@ static NSUInteger desc_length;
 
 int zoom_fraq;
 int string_start;
+int update_zoom_by = 1;
 
 - (instancetype)initWithFrame:(NSRect)frame isPreview:(BOOL)isPreview
 {
@@ -134,9 +135,17 @@ int string_start;
 - (void)animateOneFrame
 {
     // update values for animation:
-    zoom_fraq = (zoom_fraq + 1)%500;
-    string_start += 10;
-    string_start = (string_start+5)%desc_length;
+
+    zoom_fraq = zoom_fraq + update_zoom_by;
+    
+    // reverse zooming direction
+    if ((zoom_fraq == 0) || (zoom_fraq == 300)){
+        update_zoom_by = -update_zoom_by;
+    }
+    
+    
+    string_start += 5;
+    string_start = string_start % desc_length;
     
     
     [self setNeedsDisplayInRect:mainRect];
