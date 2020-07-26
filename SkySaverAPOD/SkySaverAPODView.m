@@ -13,6 +13,14 @@
 
 static NSRect mainRect;
 static NSDictionary* APODdata;
+static NSString* hdurl;
+static NSImage* pic;
+
+static NSString* desc;
+static NSFont* font;
+static NSDictionary* attributes;
+//static NSSize textSize;
+
 
 int zoom_fraq;
 
@@ -20,7 +28,7 @@ int zoom_fraq;
 {
     self = [super initWithFrame:frame isPreview:isPreview];
     if (self) {
-        [self setAnimationTimeInterval:1/30.0];
+        [self setAnimationTimeInterval:1/60.0];
         
         zoom_fraq = 0;
         mainRect = CGRectMake(0, 0, frame.size.width, frame.size.height);
@@ -48,6 +56,17 @@ int zoom_fraq;
             // do not leave initialization until data is fetched
         }
         
+        hdurl = [NSString stringWithFormat:@"%@", APODdata[@"hdurl"]];
+        pic = [[NSImage alloc] initByReferencingURL:[NSURL URLWithString:hdurl]];
+        if (!pic.isValid){
+            NSLog(@"image not created\n");
+        }
+        desc = [NSString stringWithFormat:@"%@", APODdata[@"explanation"]];
+//        font = [NSFont fontWithName:@"Helvetica" size:0.03*frame.size.height];
+//        attributes = @{ NSFontAttributeName: font,
+//                                      NSForegroundColorAttributeName: [NSColor lightGrayColor]};
+        //textSize = NSMakeSize(frame.size.width/3, frame.size.height/4);
+
 
         
     }
@@ -67,49 +86,42 @@ int zoom_fraq;
 - (void)drawRect:(NSRect)rect
 {
     NSLog(@"already in drawRect");
-    NSLog(@"isOpaque: %hhd", [self isOpaque]);
+    
     // ----------- background -----------
     [super drawRect:rect];
     [[NSColor greenColor] setFill];
     NSRectFill(rect);
-    
-    
-    
-    
+
+
     // ----------- picture -----------
-    double zoom_level = 1 + (((double)zoom_fraq)/100);
+    double zoom_level = 1 + (zoom_fraq/1000.0);
     NSLog(@"ZOOM LEVEL: %f ", zoom_level);
-    NSString* hdurl = [NSString stringWithFormat:@"%@", APODdata[@"hdurl"]];
-    NSLog(hdurl);
-    NSImage* pic = [[NSImage alloc] initByReferencingURL:[NSURL URLWithString:hdurl]];
-    
+//    NSString* hdurl = [NSString stringWithFormat:@"%@", APODdata[@"hdurl"]];
+//    NSLog(hdurl);
+    //NSImage* pic = [[NSImage alloc] initByReferencingURL:[NSURL URLWithString:hdurl]];
+
     NSSize s = [pic size];
     NSRect picRect = CGRectMake(0, 0, zoom_level*rect.size.width, zoom_level*rect.size.height);
-    
-    if (!pic.isValid){
-        NSLog(@"image not created\n");
-    }
-    
 
-    
-    
     // ----------- text -----------
 
-        
     NSSize textSize = NSMakeSize(rect.size.width/3, rect.size.height/4);
     NSRect textRect = {
         {rect.size.width-textSize.width, rect.size.height-textSize.height},
         {textSize.width, textSize.height}
     };
-    
-    
-    NSString* desc = [NSString stringWithFormat:@"%@", APODdata[@"explanation"]];
-    NSFont* font = [NSFont fontWithName:@"Helvetica" size:0.03*rect.size.height];
-    NSDictionary* attributes = @{ NSFontAttributeName: font,
-                                  NSForegroundColorAttributeName: [NSColor lightGrayColor]
-    };
 
-    
+
+//    NSString* desc = [NSString stringWithFormat:@"%@", APODdata[@"explanation"]];
+//    NSFont* font = [NSFont fontWithName:@"Helvetica" size:0.03*rect.size.height];
+//    NSDictionary* attributes = @{ NSFontAttributeName: font,
+//                                  NSForegroundColorAttributeName: [NSColor lightGrayColor]
+//    };
+    font = [NSFont fontWithName:@"Helvetica" size:0.03*rect.size.height];
+    attributes = @{ NSFontAttributeName: font,
+                                  NSForegroundColorAttributeName: [NSColor lightGrayColor]};
+
+
     // ----------- drawing -----------
     [super drawRect:picRect];
     [super drawRect:textRect];
@@ -125,7 +137,58 @@ int zoom_fraq;
 {
     //NSLog(@"Kris log-----");
     zoom_fraq = (zoom_fraq + 1)%50;
-    [self setNeedsDisplay:YES];
+    [self setNeedsDisplayInRect:mainRect];
+    
+    
+
+    
+    
+    
+    
+//    // ----------- picture -----------
+//    double zoom_level = 1 + (zoom_fraq/100.0);
+//    NSLog(@"ZOOM LEVEL: %f ", zoom_level);
+//    NSString* hdurl = [NSString stringWithFormat:@"%@", APODdata[@"hdurl"]];
+//    NSLog(hdurl);
+//    NSImage* pic = [[NSImage alloc] initByReferencingURL:[NSURL URLWithString:hdurl]];
+//
+//    NSSize s = [pic size];
+//    NSRect picRect = CGRectMake(0, 0, zoom_level*mainRect.size.width, zoom_level*mainRect.size.height);
+//
+//    if (!pic.isValid){
+//        NSLog(@"image not created\n");
+//    }
+//
+//
+//
+//
+//    // ----------- text -----------
+//
+//
+//    NSSize textSize = NSMakeSize(mainRect.size.width/3, mainRect.size.height/4);
+//    NSRect textRect = {
+//        {mainRect.size.width-textSize.width, mainRect.size.height-textSize.height},
+//        {textSize.width, textSize.height}
+//    };
+//
+//
+//    NSString* desc = [NSString stringWithFormat:@"%@", APODdata[@"explanation"]];
+//    NSFont* font = [NSFont fontWithName:@"Helvetica" size:0.03*mainRect.size.height];
+//    NSDictionary* attributes = @{ NSFontAttributeName: font,
+//                                  NSForegroundColorAttributeName: [NSColor lightGrayColor]
+//    };
+//
+//
+//    // ----------- drawing -----------
+//    [super drawRect:picRect];
+//    [super drawRect:textRect];
+//    [pic drawInRect:picRect];
+//    [[NSColor colorWithSRGBRed:0 green:0 blue:0 alpha:0.6] setFill];
+//    NSRectFillUsingOperation(textRect, NSCompositingOperationSourceOver );
+//    [desc drawInRect:textRect withAttributes:attributes];
+    
+    
+    
     return;
 }
 
