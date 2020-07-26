@@ -65,14 +65,15 @@ static NSDictionary* APODdata;
 {
     NSLog(@"already in drawRect");
     NSLog(@"isOpaque: %hhd", [self isOpaque]);
-    // background
+    // ----------- background -----------
     [super drawRect:rect];
     [[NSColor greenColor] setFill];
     NSRectFill(rect);
     
-    // picture
-    //if (APODdata){
-    //    NSImage* pic = [[NSImage alloc] initByReferencingURL:[NSURL URLWithString:@"https://apod.nasa.gov/apod/image/2007/DSC7590-Leutenegger1200c.jpg"]];
+    
+    
+    
+    // ----------- picture -----------
     
     NSString* hdurl = [NSString stringWithFormat:@"%@", APODdata[@"hdurl"]];
     NSLog(hdurl);
@@ -80,40 +81,39 @@ static NSDictionary* APODdata;
     
     NSSize s = [pic size];
     NSRect picRect = CGRectMake(0, 0, rect.size.width, rect.size.height);
-    [super drawRect:picRect];
     
     if (!pic.isValid){
         NSLog(@"image not created\n");
     }
     
-//    [pic drawInRect:picRect];
-    //    } else {
-    //        NSLog(@"Not loaded yet....");
-    //    }
-    //
-    // text
-    NSString* desc = [NSString stringWithFormat:@"%@", APODdata[@"explanation"]];
-    
 
-    NSSize textSize = NSMakeSize(rect.size.width/3, rect.size.height/4);
-    NSRect textRect = {{rect.size.width-textSize.width,
-        rect.size.height-textSize.height}, {textSize.width, textSize.height}};
-//        //CGRectMake(rect.size.width-textSize.width,
-//                                     rect.size.height-textSize.height,
-//                                     textSize.width, textSize.height);
     
+    
+    // ----------- text -----------
+
+        
+    NSSize textSize = NSMakeSize(rect.size.width/3, rect.size.height/4);
+    NSRect textRect = {
+        {rect.size.width-textSize.width, rect.size.height-textSize.height},
+        {textSize.width, textSize.height}
+    };
+    
+    
+    NSString* desc = [NSString stringWithFormat:@"%@", APODdata[@"explanation"]];
+    NSFont* font = [NSFont fontWithName:@"Helvetica" size:0.03*rect.size.height];
+    NSDictionary* attributes = @{ NSFontAttributeName: font,
+                                  NSForegroundColorAttributeName: [NSColor lightGrayColor]
+    };
+
+    
+    // ----------- drawing -----------
+    [super drawRect:picRect];
     [super drawRect:textRect];
     [pic drawInRect:picRect];
-    [[NSColor colorWithSRGBRed:0.3 green:1 blue:0.3 alpha:0.1] setFill];
-    //NSRectFill(textRect);
+    [[NSColor colorWithSRGBRed:0 green:0 blue:0 alpha:0.6] setFill];
+    NSRectFillUsingOperation(textRect, NSCompositingOperationSourceOver );
+    [desc drawInRect:textRect withAttributes:attributes];
 
-    NSRectFillUsingOperation(textRect, NSCompositingOperationSourceOver );//NSCompositingOperationSourceOver);
-    
-//    NSFont* font = [NSFont fontWithName:@"Helvetica" size:0.03*rect.size.height];
-//    NSDictionary* attributes = @{ NSFontAttributeName: font,
-//                                  NSForegroundColorAttributeName: [NSColor lightGrayColor]
-//    };
-//    [desc drawInRect:textRect withAttributes:attributes];
     
 }
 
