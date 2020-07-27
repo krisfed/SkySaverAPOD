@@ -23,6 +23,8 @@ static NSMutableParagraphStyle* paragraphStyle;
 static NSRect picRect;
 static NSUInteger desc_length;
 static double font_fraction = 0.04;
+static double img_height_by_width_ratio;
+static NSSize img_size;
 
 // for animation
 static int zoom_fraq;
@@ -71,8 +73,11 @@ static int update_zoom_by = 1;
         if (!pic.isValid){
             NSLog(@"image not created\n");
         }
-        //desc = [NSString stringWithFormat:@"%@", APODdata[@"explanation"]];
-        desc = @"hello world, hello world";
+        img_size = [pic size];
+        img_height_by_width_ratio = img_size.height/img_size.width;
+        
+        desc = [NSString stringWithFormat:@"%@", APODdata[@"explanation"]];
+        //desc = @"hello world, hello world";
         desc_length = [desc length];
         
     }
@@ -100,11 +105,16 @@ static int update_zoom_by = 1;
 
 
     // ----------- picture -----------
-    picRect = CGRectMake(0, 0, rect.size.width, rect.size.height);
+    
+    if (img_height_by_width_ratio  > 1) { // height is bigger
+        picRect = CGRectMake(0, 0, rect.size.height/img_height_by_width_ratio, rect.size.height);
+    } else { // width is bigger
+        picRect = CGRectMake(0, 0, rect.size.width, rect.size.width*img_height_by_width_ratio);
+    }
+
     double portion_to_display = 1 - (zoom_fraq/1000.0);
-    NSSize s = [pic size];
     NSRect picPortionRect = { {0,0},
-        {s.width*portion_to_display, s.height*portion_to_display}
+        {img_size.width*portion_to_display, img_size.height*portion_to_display}
     };
 
     // ----------- text -----------
