@@ -71,8 +71,8 @@ static int update_zoom_by = 1;
         if (!pic.isValid){
             NSLog(@"image not created\n");
         }
-        desc = [NSString stringWithFormat:@"%@", APODdata[@"explanation"]];
-        //desc = @"hello world, hello world";
+        //desc = [NSString stringWithFormat:@"%@", APODdata[@"explanation"]];
+        desc = @"hello world, hello world";
         desc_length = [desc length];
         
     }
@@ -119,7 +119,9 @@ static int update_zoom_by = 1;
     NSUInteger num_horz_chars = rect.size.width/character_width;
     BOOL needs_padding = NO;
     NSRange string_range = NSMakeRange(string_start, num_horz_chars);
-    if ((string_start + num_horz_chars) > desc_length){ // end of desc
+    if (desc_length < num_horz_chars){
+        string_range = NSMakeRange(0, desc_length);
+    } else if ((string_start + num_horz_chars) > desc_length){ // end of desc
         // do not exceed the length of desc
         string_range = NSMakeRange(string_start, desc_length - string_start);
         needs_padding = YES;
