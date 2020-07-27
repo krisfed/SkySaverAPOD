@@ -50,7 +50,8 @@ static int update_zoom_by = 1;
         NSURLSession *session = [NSURLSession sharedSession];
 
         // Create a NSURL object.
-        NSURL* url = [NSURL URLWithString:@"https://api.nasa.gov/planetary/apod?api_key=v7ZYRL3q51GauWq1JYwg3ytoNDwm3ELnOGe7H6H8&date=2020-07-24"];
+//        NSURL* url = [NSURL URLWithString:@"https://api.nasa.gov/planetary/apod?api_key=v7ZYRL3q51GauWq1JYwg3ytoNDwm3ELnOGe7H6H8&date=2020-07-24"];
+          NSURL* url = [NSURL URLWithString:@"https://api.nasa.gov/planetary/apod?api_key=v7ZYRL3q51GauWq1JYwg3ytoNDwm3ELnOGe7H6H8&date=2020-07-18"];
 
         // Create NSURLSessionDataTask task object by url and session object.
         NSURLSessionDataTask* task = [session dataTaskWithURL:url completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
@@ -100,17 +101,23 @@ static int update_zoom_by = 1;
     
     // ----------- background -----------
     [super drawRect:rect];
-    [[NSColor greenColor] setFill];
+    [[NSColor colorWithWhite:0.06 alpha:0.8] setFill];
     NSRectFill(rect);
 
 
     // ----------- picture -----------
     
+    NSSize picRectSize;
     if (img_height_by_width_ratio  > 1) { // height is bigger
-        picRect = CGRectMake(0, 0, rect.size.height/img_height_by_width_ratio, rect.size.height);
+        picRectSize = NSMakeSize(rect.size.height/img_height_by_width_ratio, rect.size.height);
+        
+        picRect = CGRectMake((rect.size.width-picRectSize.width)/2.0, 0, picRectSize.width, picRectSize.height);
     } else { // width is bigger
-        picRect = CGRectMake(0, 0, rect.size.width, rect.size.width*img_height_by_width_ratio);
+        picRectSize = NSMakeSize(rect.size.width, rect.size.width*img_height_by_width_ratio);
+        picRect = CGRectMake(0, (rect.size.height-picRectSize.height)/2.0, picRectSize.width, picRectSize.height);
+        //picRect = CGRectMake(0, 0, picRectSize.width, picRectSize.height);
     }
+    
 
     double portion_to_display = 1 - (zoom_fraq/1000.0);
     NSRect picPortionRect = { {0,0},
