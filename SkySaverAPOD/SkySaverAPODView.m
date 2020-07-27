@@ -19,14 +19,15 @@ static NSImage* pic;
 static NSString* desc;
 static NSFont* font;
 static NSDictionary* attributes;
-//static NSSize textSize;
+static NSMutableParagraphStyle* paragraphStyle;
 static NSRect picRect;
 static NSUInteger desc_length;
+static double font_fraction = 0.04;
 
-
-int zoom_fraq;
-int string_start;
-int update_zoom_by = 1;
+// for animation
+static int zoom_fraq;
+static int string_start;
+static int update_zoom_by = 1;
 
 - (instancetype)initWithFrame:(NSRect)frame isPreview:(BOOL)isPreview
 {
@@ -37,6 +38,10 @@ int update_zoom_by = 1;
         zoom_fraq = 0;
         string_start = 0;
         mainRect = CGRectMake(0, 0, frame.size.width, frame.size.height);
+        
+        paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+        paragraphStyle.alignment = NSTextAlignmentRight;
+        paragraphStyle.headIndent = 10;
         
         // request HTTP info
         // Create NSURLSession object
@@ -67,6 +72,7 @@ int update_zoom_by = 1;
             NSLog(@"image not created\n");
         }
         desc = [NSString stringWithFormat:@"%@", APODdata[@"explanation"]];
+        //desc = @"hello world, hello world";
         desc_length = [desc length];
         
     }
@@ -103,18 +109,31 @@ int update_zoom_by = 1;
 
     // ----------- text -----------
 
-    NSSize textSize = NSMakeSize(rect.size.width, 0.03*rect.size.height + 5);
+    NSSize textSize = NSMakeSize(rect.size.width, (font_fraction + 0.01)*rect.size.height);
     NSRect textRect = {
         {rect.size.width-textSize.width, rect.size.height-textSize.height},
         {textSize.width, textSize.height}
     };
+    
+    double character_width = font_fraction*rect.size.height*0.6; // estimate
+    NSUInteger num_horz_chars = rect.size.width/character_width;
+    BOOL needs_padding = NO;
+    NSRange string_range = NSMakeRange(string_start, num_horz_chars);
+    if ((string_start + num_horz_chars) > desc_length){ // end of desc
+        // do not exceed the length of desc
+        string_range = NSMakeRange(string_start, desc_length - string_start);
+        needs_padding = YES;
+    } else if (string_start < num_horz_chars) { // start of desc
+        string_range = NSMakeRange(0, string_start);
+    }
+    NSString* string_to_display = [desc substringWithRange:string_range];
 
-    NSString* string_to_display = [desc substringFromIndex:string_start];
+    if (needs_padding) {
+        string_to_display = [string_to_display stringByPaddingToLength:num_horz_chars withString:@" - " startingAtIndex:0];
+    }
 
-    font = [NSFont fontWithName:@"Helvetica" size:0.03*rect.size.height];
-    NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
-    //paragraphStyle.alignment = NSTextAlignmentCenter;
-    paragraphStyle.headIndent = 10;
+    font = [NSFont fontWithName:@"Monaco" size:font_fraction*rect.size.height];
+
     attributes = @{ NSFontAttributeName: font,
                     NSForegroundColorAttributeName: [NSColor lightGrayColor],
                     NSParagraphStyleAttributeName: paragraphStyle
@@ -143,9 +162,7 @@ int update_zoom_by = 1;
         update_zoom_by = -update_zoom_by;
     }
     
-    
-    string_start += 5;
-    string_start = string_start % desc_length;
+    string_start = (string_start + 1) % desc_length;
     
     
     [self setNeedsDisplayInRect:mainRect];
